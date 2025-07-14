@@ -1,0 +1,5 @@
+create table room(
+	room\_no varchar(2) not null unique,
+	name varchar(12) not null,
+	primary key( room\_no )
+);

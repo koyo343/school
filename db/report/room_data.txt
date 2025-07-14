@@ -1,0 +1,9 @@
+insert into room values( '01', '伊勢ヶ濱' );
+insert into room values( '02', '大島' );
+insert into room values( '03', '高砂' );
+insert into room values( '04', '田子ノ浦' );
+insert into room values( '05', '二子山' );
+insert into room values( '06', '宮城野' );
+insert into room values( '07', '武蔵川' );
+insert into room values( '08', '井筒' );
+insert into room values( '09', '東関' );

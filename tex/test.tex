@@ -1,0 +1,635 @@
+\documentclass[a4j,12pt]{jreport}
+
+
+\title{ データベース 演習課題レポート\\第1回提出}
+\author{学生番号: 222C1029\\\\氏名: 江藤 洸陽}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\chapter{データベーススキーマの設計}
+
+\section{初期スキーマの作成}
+歴代の横綱の情報を管理するためのデータベースを作成する。\\
+横綱の情報を表すために必要な属性を書き出して、以下の初期スキーマを作成した。\\
+\\
+横綱 ( 横綱代位, 出身, 四股名, 部屋番号, 部屋名, 横綱昇進年 )
+
+\subsection{属性の説明}
+
+初期スキーマにおける各属性の役割とドメインは、以下の通りである。
+
+\begin{description}
+
+\item[横綱代位]
+横綱の代数を表す。2桁の数字による文字列となる。
+
+\item[出身]
+横綱の出身地域を表す。最大4文字の文字列となる。
+
+\item[四股名]
+横綱の四股名を表す。最大7文字の文字列となる。
+  
+\item[部屋番号]
+力士が所属する相撲部屋の番号を表す。2桁の数字による文字列となる。
+
+\item[部屋名]
+力士が所属する相撲部屋を表す。 最大4文字の文字列となる。
+
+\item[横綱昇進年]
+横綱に昇進した年を表す。4桁の数字による文字列となる。
+
+\end{description}
+
+\section{リレーションに格納されるデータ}
+
+横綱リレーションに格納されるデータは、以下の条件を満たす。
+
+\begin{enumerate}
+\item 横綱には固有の横綱代位が割り当てられており、横綱代位が同じである横綱が複数存在することはない。
+\item 四股名と横綱昇進年の両方が同じ横綱が複数存在することはない。
+\item 各部屋には固有の部屋番号を割り当てており、部屋番号が同じである横綱は部屋名も同じとなる。
+\end{enumerate}
+
+
+\subsection{候補キー・主キー}
+条件1より、\{ 横綱代位 \} は横綱リレーションの候補キーとなる。\\
+条件2より、\{ 四股名, 横綱昇進年\} も従業員リレーションの候補キーとなる。\\
+ここでは、2つの候補キーのうち、横綱代位 を主キーとする。\\
+主キー属性に下線を引いた初期スキーマは、以下の通りである。\\
+
+横綱( \underline{横綱代位}, 出身, 四股名, 部屋番号, 部屋名, 横綱昇進年 )
+
+
+\subsection{関数従属性・多値従属性}
+条件3 より、部屋番号 → 部屋名 の関数従属性が存在する。\\
+
+\section{リレーションスキーマの正規化}
+横綱リレーションが全ての正規形を満たすように、正規化を行う。
+
+
+\subsection{第1正規形}
+横綱レーションは、全ての属性が単一の値を持つため、第1正規形を満たす。\\
+
+
+\subsection{第2正規形}
+横綱リレーションは、候補キーの一部の属性から候補キー以外の属性への関数従属性は存在しないため、第2正規形を満たす。\\
+
+\subsection{第3正規形}
+従業員リレーションは、部屋番号 → 部屋名 の関数従属性により、候補キー以外の属性から候補キー以外の属性への関数従属性が存在するため、第3正規形を満たさない。
+第3正規形を満たすようにするために、従業員リレーションを、以下のように分解する。\\
+
+横綱( \underline{横綱代位}, 四股名, 部屋番号, 横綱昇進年 )\\
+部屋( \underline{部屋番号}, 部屋名 )\\
+
+\subsection{ボイス・コッド正規形}
+横綱リレーションは、キー属性の一部が非キー属性に関数従属しないのでボイスコット正規形を満たす。\\
+部屋リレーションは、キー属性の一部が非キー属性に関数従属しないのでボイスコット正規形を満たす。\\
+
+
+\subsection{第4正規形}
+横綱リレーションは、すべての非キー属性が他の非キー属性に対して完全関数従属しているので第4正規系を満たす。\\
+部屋リレーションは、すべての非キー属性が他の非キー属性に対して完全関数従属しているので第4正規系を満たす。\\
+
+
+\subsection{第5正規形}
+横綱リレーションは、結合従属性が存在していないので第5正規系を満たす。\\
+部屋リレーションは、結合従属性が存在していないので第5正規系を満たす。\\
+
+\section{正規化後のリレーションスキーマ}
+最終的に、以下のリレーションスキーマが得られた。\\
+
+横綱( \underline{横綱代位}, 四股名, 部屋番号, 横綱昇進年 )\\
+部屋( \underline{部屋番号}, 部屋名 )\\
+
+最終的に得られたリレーションスキーマには、下記の参照整合性制約（外部キー制約）が存在する。\\
+
+横綱の部屋番号（部屋の部屋番号を参照）
+
+\chapter{データベースの作成}
+
+\section{テーブルの定義}
+
+※ 前章で設計したリレーションスキーマと、実際に作成するアルファベットで表記したテーブルの対応関係を示す。\\
+
+前章で設計した以下のリレーションスキーマにもとづいてデータベースを作成する。\\
+
+横綱( \underline{横綱代位}, 四股名, 部屋番号, 横綱昇進年 )\\
+部屋( \underline{部屋番号}, 部屋名 )\\
+
+参照整合性制約（外部キー制約）\\
+横綱の部屋番号（部屋の部屋番号を参照）
+\\
+
+テーブル名・属性名をアルファベットに置き換えて、以下のテーブルを作成する。\\
+
+yokozuna( \underline{id}, name, room\_no, promo\_year )\\
+room( \underline{room\_no}, name )\\
+
+
+\section{テーブルの作成}
+
+※ テーブルの作成（参照整合性制約の設定を含む）は、授業で扱った複数の方法のうちのどの方法を用いても構わないが、具体的に使用した作成方法が分かるように説明を記述する。参照整合性制約は、テーブル作成時に設定しても、テーブル作成後に追加で設定しても、どちらでも構わない。後のインターフェース作成で必要となる、テーブルへの利用権限の設定については、データベースの作成に関する説明としては必須ではないため、説明しても、説明しなくとも、どちらでも構わない。以下の例では、説明を記述している。\\
+
+以下のコマンドを使用して、従業員（yokozuna）テーブルを作成した。
+
+\begin{lstlisting}[caption=従業員テーブルの作成のコマンド]
+create table yokozuna(
+	id varchar(4) not null unique,
+	room_no varchar(2),
+	name varchar(12) not null,
+	promo_year int2, 
+	primary key( id )
+);
+\end{lstlisting}
+\vspace{3mm}
+
+以下のコマンドを使用して、部屋（room）テーブルを作成した。
+
+\begin{lstlisting}[caption=部屋テーブルの作成のコマンド]
+create table room(
+	room\_no varchar(2) not null unique,
+	name varchar(12) not null,
+	primary key( room\_no )
+);
+\end{lstlisting}
+\vspace{3mm}
+
+以下のコマンドを使用して、横綱（yokozuna）テーブルに参照整合性制約を追加した。
+
+\begin{lstlisting}[caption=横綱テーブルへの参照整合性制約の設定のコマンド]
+alter table yokozuna add constraint yokozuna_room_key foreign key (room_no) references room (room_no);
+\end{lstlisting}
+\vspace{3mm}
+
+以下のコマンドを使用して、全てのテーブルに対して、ウェブサーバへの利用権限を設定した。
+
+\begin{lstlisting}[caption=従業員・部門テーブルへの利用権限の設定のコマンド]
+grant all on yokozuna to apache;
+grant all on room to apache;
+\end{lstlisting}
+
+
+\section{初期データの挿入}
+
+※ 初期データの挿入についても、テーブルの作成と同様に、授業で扱った複数の方法のうちのどの方法を用いても構わないが、具体的に使用した作成方法が分かるように説明を記述する。また、挿入した全てのデータの内容が分かるように記述する。\\
+
+以下のテキストファイル・コマンドを使用して、横綱（yokozuna）テーブルに初期データを挿入した。
+
+\begin{lstlisting}[caption=従業員テーブルの初期データ（yokozuna\_data.txt\_list.php）]
+  63,青森,旭富士正也,02,大島,1990
+  64,アメリカ,曙太郎,09,東関,1993
+  65,東京,貴乃花光司,05,二子山,1995
+  66,東京,若乃花勝,05,二子山,1998
+  67,アメリカ,武蔵丸光洋,07,武蔵川,1999
+  68,モンゴル,朝青龍明徳,03,高砂,2003
+  69,モンゴル,白鵬翔,06,宮城野,2007
+  70,モンゴル,日馬富士公平,01,伊勢ヶ濱,2012
+  71,モンゴル,鶴竜力三郎,08,井筒,2014
+  72,茨城,稀勢の里寛,04,田子ノ浦,2017
+\end{lstlisting}
+
+\begin{lstlisting}[caption=横綱テーブルへの初期データの挿入]
+COPY employee from employee_data.txt
+\end{lstlisting}
+\vspace{3mm}
+
+以下のテキストファイルとコマンドを使用して、部屋（room）テーブルに初期データを挿入した。
+
+\begin{lstlisting}[caption=部屋テーブルへの初期データの挿入（room\_data.txt）]
+insert into department values( '01', '伊勢ヶ濱' );
+insert into department values( '02', '大島' );
+insert into department values( '03', '高砂' );
+insert into department values( '04', '田子ノ浦' );
+insert into department values( '05', '二子山' );
+insert into department values( '06', '宮城野' );
+insert into department values( '07', '武蔵川' );
+insert into department values( '08', '井筒' );
+insert into department values( '09', '東関' );
+\end{lstlisting}
+
+\begin{lstlisting}[caption=部門テーブルへの初期データの挿入]
+\i department_data.txt
+\end{lstlisting}
+
+
+\section{テーブルの格納データの確認}
+
+※ 最終的に作成した全てのテーブルに格納されているデータを示す。各テーブルの全てのデータを出力するSQLを実行して、その出力結果をコピーしたものを示す。自分が開発したインターフェースを使って、2.3節で示した初期データ以外のデータを追加してり、変更・削除した場合は、それでも構わないので、レポート提出時点でテーブルに格納されている全てのデータを示す。
+なお、verbatim環境を使うと、文字数が多い行はページの横幅を超えてしまうため、手作業で適当に改行を挿入して、ページ内に収まるように調整する。整形が難しい場合は、verbatim環境の代わりに、lstlisting環境を用いても構わない。\\
+
+SQLを使って従業員（employee）テーブルに格納されている全てのデータを表示すると、以下のようになる。
+
+\begin{verbatim}
+abcd1234=> select * from employee;
+  id  | dept_no |   name    | age 
+------+---------+-----------+-----
+ 0001 | 01      | 織田 信長 |  48
+ 0002 | 02      | 豊臣 秀吉 |  45
+ 0003 | 03      | 徳川 家康 |  39
+ 0004 | 01      | 柴田 勝家 |  60
+ 0005 | 02      | 伊達 政宗 |  15
+ 0006 | 03      | 上杉 景勝 |  26
+ 0007 | 01      | 島津 家久 |  35
+(7 rows)
+\end{verbatim}
+\vspace{3mm}
+
+SQLを使って部門（department）テーブルに格納されている全てのデータを表示すると、以下のようになる。
+
+\begin{verbatim}
+abcd1234=> select * from department;
+ dept_no | name 
+---------+------
+ 01      | 開発
+ 02      | 営業
+ 03      | 総務
+(3 rows)
+\end{verbatim}
+\vspace{3mm}
+
+
+\chapter{データベースへの問い合わせ}
+
+※ 作成したデータベースに対して、データベースを利用する際に使われる問い合わせの具体例を考えて、その問い合わせに対するSQLと実行結果を最低３つ示す。
+問い合わせの具体例は何でも構わないが、出力結果が想定した問い合わせと一致しているか（正しい結果が出力されているか）を確認すること。
+なるべく GROUP BY（+HAVING）や入れ子型問い合わせ（相関あり・なし）などの、授業で学習したやや複雑な構文を用いたSQLを含めることが望ましい。\\
+
+2章で作成したデータベースに対して、以下のようなSQLを使った問い合わせのテストを行った。
+
+\section{問い合わせ1}
+
+※ 問い合わせ、その問い合わせを実行するためのSQL、データベースに対して実行した結果を順番に記述する。
+実行結果は、2.4節で示した、データベースの格納データに対してSQLを実行したときの結果を示すこと。
+なお、verbatim環境を使うと、文字数が多い行はページの横幅を超えてしまうため、手作業で適当に改行を挿入して、ページ内に収まるように調整する。整形が難しい場合は、verbatim環境の代わりに、lstlisting環境を用いても構わない。\\
+
+問い合わせ：\\
+全ての従業員の従業員番号、氏名、部門、年齢の一覧を出力する。\\
+
+SQL：
+\begin{verbatim}
+select id, employee.name, department.name, employee.age from employee, department 
+where employee.dept_no = department.dept_no
+\end{verbatim}
+\vspace{3mm}
+
+実行結果：
+\begin{verbatim}
+abcd1234=> select id, employee.name, department.name, employee.age from employee, department 
+where employee.dept_no = department.dept_no;
+  id  |   name    | name | age 
+------+-----------+------+-----
+ 0001 | 織田 信長 | 開発 |  48
+ 0002 | 豊臣 秀吉 | 営業 |  45
+ 0003 | 徳川 家康 | 総務 |  39
+ 0004 | 柴田 勝家 | 開発 |  60
+ 0005 | 伊達 政宗 | 営業 |  15
+ 0006 | 上杉 景勝 | 総務 |  26
+ 0007 | 島津 家久 | 開発 |  35
+(7 rows)
+\end{verbatim}
+
+
+\section{問い合わせ2}
+
+※ 同様に、2つ目の問い合わせについても、問い合わせ、SQL、実行結果を記述する。\\
+
+問い合わせ：\\
+従業員番号が'0003'の従業員と同じ部門に所属する従業員の、従業員番号と氏名の一覧を出力する。\\
+
+SQL：
+\begin{verbatim}
+???????
+\end{verbatim}
+\vspace{3mm}
+
+実行結果：
+\begin{verbatim}
+???????
+\end{verbatim}
+
+
+\section{問い合わせ3}
+
+※ 同様に、3つ目の問い合わせについても、問い合わせ、SQL、実行結果を記述する。\\
+
+問い合わせ：\\
+各部門で最も年上の人間を検索して、各部門の部門名、部門内の最年長者の氏名、年齢の一覧を出力する。\\
+
+SQL：
+\begin{verbatim}
+???????
+\end{verbatim}
+
+実行結果：
+\begin{verbatim}
+???????
+\end{verbatim}
+
+※ 4つ以上の問い合わせを作成する場合は、節を追加して、同様に記述する。\\
+
+
+\chapter{Webインターフェースの作成}
+
+\section{作成したインターフェースのメニューページ}
+
+※ 作成したインターフェースのメニューページのURLを示す。\\
+
+2章で作成したデータベースを利用するためのインターフェースを開発した。\\
+作成したインターフェースのメニューページのURLは、下記の通りである。
+
+\begin{verbatim}
+http://db.tom.ai.kyutech.ac.jp/~????/????.html
+\end{verbatim}
+
+
+\section{作成したインターフェースの構成}
+
+※ 作成したインターフェースの概要を説明し、インターフェースを構成する全てのファイルと、それぞれの役割や階層構造が分かる説明を示す。\\
+
+従業員と部門を結合して一覧表示する機能を作成した。\\
+授業員テーブルへのデータの挿入・削除・更新のための機能を作成した。\\
+部門テーブルについては、更新の頻度が少ないため、データの挿入・削除・更新の機能は作成していない。\\
+また、従業員を部門と年齢の条件を組み合わせて検索できる機能を作成した。\\
+インターフェースを構成するファイルの役割や階層構造は、下記の通りである。
+
+\begin{itemize}
+\item メニューページ（menu.html）
+	\begin{itemize}
+	\item 従業員・部門の一覧表示（employee\_list.php）
+	\item 従業員のデータ追加の入力フォーム（employee\_add\_form.php）
+		\begin{itemize}
+			\item 従業員のデータ追加の処理実行（employee\_add.php）
+		\end{itemize}
+	\item 従業員のデータ削除の選択（employee\_delete\_form.php）
+		\begin{itemize}
+			\item 従業員のデータ削除の処理実行（employee\_delete.php）
+		\end{itemize}
+	\item 従業員のデータ更新の選択（employee\_update\_form1.php）
+		\begin{itemize}
+			\item 従業員のデータ更新の入力フォーム（employee\_update\_form2.php）
+			\begin{itemize}
+				\item 従業員のデータ更新の処理実行（employee\_update.php）
+			\end{itemize}
+		\end{itemize}
+	\item 従業員の検索の入力フォーム（employee\_search\_form.php）
+		\begin{itemize}
+			\item 従業員の検索結果の表示（employee\_search\_result.php）
+		\end{itemize}
+	\item ・・・\\ （全てのファイルの構成を説明する。）
+	\end{itemize}
+\end{itemize}
+
+
+\section{メニューページ}
+
+※ メニューページのソースファイル全体を引用して、メニューの項目を説明する。また、メニューページをウェブブラウザで表示したときのスクリーンショットを示す。メニューが複数のページにより構成される場合は、その全てについて説明する。\\
+
+メニューページは、上記の階層構造においてメニューページの下位のページである、従業員・部門の一覧表示（employee\_list.php）、従業員のデータ追加（employee\_add\_form.php）、従業員のデータ削除（employee\_delete\_form.php）、従業員のデータ更新（employee\_update\_form1.php）、従業員の検索（employee\_search\_form.php）の各ページへのリンクを含む。
+
+\lstinputlisting[caption=menu.html]{menu.html}
+
+図\ref{fig:menu} は、ウェブブラウザでメニューページを表示したときのスクリーンショットを示したものである。
+
+\begin{figure}[h]
+	\begin{center}
+		\fbox{
+			\includegraphics[width=0.4\textwidth]{menu.eps}
+		}
+	\end{center}
+	\caption{メニューページの表示結果
+	}
+	\label{fig:menu}
+\end{figure}
+
+
+\section{従業員の一覧表示}
+
+※ 以降、各機能ごとに節（4.x）を分けて、各可能の実現方法を説明する。一つの機能が複数のウェブページから構成される場合は、さらに各ウェブページごとに小節（4.x.x）を分けて説明する。また、各機能について、節の最後に小節を追加して、実行結果の例を示すこと。
+
+\subsection{従業員の一覧表示（employee\_list.php）}
+
+※ 各ウェブページの説明では、小節の末尾に作成したソースファイル全体を省略せずに引用し、その重要な箇所について、行番号で参照しながら説明を加える。ソースファイルの全ての行について説明を行う必要はない。前のページから渡される入力や、そのページで使用するSQLとその作成方法、結果の表示方法等の重要な点について説明する。\\
+
+全従業員の一覧を表示するPHPプログラムを含むページである。従業員と部門のテーブルを結合して、従業員番号にもとづいて昇順で並べて表示する。また、全体で何件の従業員のデータが存在しているかの情報を、従業員一覧の後に表示する。\\
+
+プログラムの27行目で従業員の一覧を作成するSQL文を作成して、30行目でそのSQL文を実行している。\\
+
+\begin{lstlisting}[caption=従業員の一覧表示のためのSQL]
+select id, department.name, employee.name, age from employee, department where employee.dept_no = department.dept_no order by id
+\end{lstlisting}
+
+この問い合わせは、前ページでの利用者の入力によって変化するようなことはなく、毎回同じ問い合わせを実行するため、ソースファイル中で固定のSQL文を文字列として設定している。
+
+\lstinputlisting[caption=employee\_list.php]{employee_list.php}
+
+
+\subsection{従業員の一覧表示の実行例}
+
+※ 実際にインターフェースを操作したときのスクリーンショットを使って、作成した機能が正しく動作していることが分かる結果を示す。複数のページや操作からなる機能については、複数のスクリーンショットを使って、操作の過程や結果が分かるようにする。（後の例を参照。） LaTeX では、図は自動的に配置されるため、本文中で正しい図番号を使って参照されていれば、対応する説明から少し離れた位置に図が配置されていても構わない。スクリーンショットを示すときには、画面に表示・入力されている文字が読めるような、適切な解像度・大きさの画像を用いること。\\
+
+図\ref{fig:example_list1} は、一覧表示の操作を行ったときのスクリーンショットを示したものである。
+
+\begin{figure}[h]
+	\begin{center}
+		\fbox{
+			\includegraphics[width=0.4\textwidth]{employee_list.eps}
+		}
+	\end{center}
+	\caption{従業員の一覧表示の実行結果
+	}
+	\label{fig:example_list1}
+\end{figure}
+
+
+\section{従業員の追加}
+
+・・・
+
+\subsection{従業員のデータ追加の入力フォーム（employee\_add\_form.php）}
+
+・・・
+
+\subsection{従業員のデータ追加の処理実行（employee\_add.php）}
+
+※ 前のページから渡される入力がある場合は、その説明を行う。\\
+
+前のページのフォームに対して入力された、以下の情報を受け取る。プログラムの??～??行目で、これらのデータを取得して、各変数に代入する。
+
+\begin{itemize}
+\item 従業員番号（name） → \$name
+\item 部門番号（dept\_no） → \$dept\_no
+\item 氏名（name） → \$name
+\item 年齢（age） → \$age
+\end{itemize}
+
+プログラムの??行目で、従業員テーブルにインスタンスを追加するためのSQL文を作成する。
+SQL文の \%1, \%2, \%3, \%4 には、変数 \$name, \$dept\_no, \$name, \$age の値が挿入される。
+??行目で、作成したSQL文を実行する。\\
+
+\begin{lstlisting}[caption=従業員の追加のためのSQL]
+insert into employee values( %1, %2, %3, %4 )
+\end{lstlisting}
+\vspace{3mm}
+
+・・・
+
+\subsection{従業員の追加の実行例}
+
+・・・
+
+
+\section{従業員の削除}
+
+・・・
+
+\subsection{従業員のデータ削除の選択（employee\_delete\_form.php）}
+
+・・・
+
+\subsection{従業員のデータ削除の処理実行（employee\_delete.php）}
+
+・・・
+
+\subsection{従業員の削除の実行例}
+
+・・・
+
+
+\section{従業員の更新}
+
+・・・
+
+\subsection{従業員のデータ更新の選択（employee\_update\_form1.php）}
+
+・・・
+
+\subsection{従業員のデータ更新の入力フォーム（employee\_update\_form2.php）}
+
+・・・
+
+\subsection{従業員のデータ更新の処理実行（employee\_update.php）}
+
+・・・
+
+
+\subsection{従業員のデータ更新の実行例}
+
+※ 複数のページによって実現される機能については、複数のスクリーンショットを用いて、正しく機能が実行されている例を示す。\\
+
+図\ref{fig:employee_update1}～\ref{fig:employee_update5} は、従業員「伊達 政宗」の部門を「総務」から「営業」に更新する操作を行ったときの、一連のスクリーンショットを示したものである。
+
+\begin{figure}[h]
+	\begin{center}
+		\fbox{
+			\includegraphics[width=0.6\textwidth]{employee_update1.eps}
+		}
+	\end{center}
+	\caption{従業員の更新の実行結果(1)：選択フォームから更新する従業員を選択
+	}
+	\label{fig:employee_update1}
+\end{figure}
+
+\begin{figure}[h]
+	\begin{center}
+		\fbox{
+			\includegraphics[width=0.6\textwidth]{employee_update2.eps}
+		}
+	\end{center}
+	\caption{従業員の更新の実行結果(2)：入力フォームに移り、選択した従業員の現在の情報が表示される
+	}
+	\label{fig:employee_update2}
+\end{figure}
+
+\begin{figure}[h]
+	\begin{center}
+		\fbox{
+			\includegraphics[width=0.6\textwidth]{employee_update3.eps}
+		}
+	\end{center}
+	\caption{従業員の更新の実行結果(3)：入力フォームで、部門の情報を変更して、送信ボタンを押す
+	}
+	\label{fig:employee_update3}
+\end{figure}
+
+\begin{figure}[h]
+	\begin{center}
+		\fbox{
+			\includegraphics[width=0.8\textwidth]{employee_update4.eps}
+		}
+	\end{center}
+	\caption{従業員の更新の実行結果(4)：更新処理の実行結果が表示される
+	}
+	\label{fig:employee_update4}
+\end{figure}
+
+\begin{figure}[h]
+	\begin{center}
+		\fbox{
+			\includegraphics[width=0.6\textwidth]{employee_update5.eps}
+		}
+	\end{center}
+	\caption{従業員の更新の実行結果(5)：一覧表示を行い、従業員の情報が更新されていることを確認する
+	}
+	\label{fig:employee_update5}
+\end{figure}
+
+
+\clearpage
+
+\section{従業員の検索}
+
+・・・
+
+\subsection{従業員の検索の入力フォーム（employee\_search\_form.php）}
+
+・・・
+
+\subsection{従業員の検索結果の表示（employee\_search\_result.php）}
+
+※ 場合分けや複数のSQLを使い分ける場合は、その説明を行う。\\
+
+前のページのフォームに対して入力された、以下の情報を受け取る。プログラムの??行目で、データを取得して、変数に代入する。
+
+\begin{itemize}
+\item 部門番号（dept\_no） → \$dept\_no
+\end{itemize}
+
+プログラムの??～??行目で、従業員の検索を行うためのSQL文を作成する。
+変数 \$dept\_no に文字列「ALL」が格納されている場合は、全ての部門の従業員を表示するためのSQLを実行する。
+
+\begin{lstlisting}[caption=全ての従業員を表示するためのSQL]
+select id, department.name, employee.name, age from employee, department where employee.dept_no = department.dept_no order by id";
+\end{lstlisting}
+\vspace{3mm}
+
+変数 \$dept\_no に「ALL」以外の文字列が格納されている場合は、部門番号が \$dept\_no に等しい従業員のみを表示するためのSQLを実行する。
+SQL文の \$dept\_no には、その変数の値が挿入される。
+
+\begin{lstlisting}[caption=指定された部門番号に所属する従業員を検索するためのSQL]
+select id, department.name, employee.name, age from employee, department where employee.dept_no = department.dept_no and employee.dept_no = '$dept_no' order by id";
+\end{lstlisting}
+\vspace{3mm}
+
+
+\subsection{従業員のデータ検索の実行例}
+
+※ 複数の条件を組み合わせた検索機能など、機能が正しく動作していることを示すために複数の実行例を示した方が良い場合は、複数の実行例を示す。
+ただし、必要以上に多数の実行例（全ての条件の組み合わせのバリエーションなど）を示す必要はないので、いくつかの代表的な実行例を示す。\\
+
+図??～?? は、部門のみを条件とする検索の実行例として、部門が「総務」である従業員を検索する操作を行ったときの、一連のスクリーンショットを示したものである。\\
+
+図??～?? は、部門と年齢を組み合わせた条件とする検索の実行例として、部門が「開発」で、かつ年齢が20歳以上30歳以下の従業員を検索する操作を行ったときの、一連のスクリーンショットを示したものである。\\
+
+・・・\\
+
+・・・
+
+
+\chapter{まとめ}
+
+※ まとめや感想として、何か書きたいこと（工夫した点や、詰まった点、反省点など）があれば、自由に記述する。何もなければ、この章は省略して構わない。
+
+
+\end{document}

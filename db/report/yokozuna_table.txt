@@ -1,0 +1,7 @@
+create table yokozuna(
+	id varchar(4) not null unique,
+	room_no varchar(2),
+	name varchar(12) not null,
+	promo_year int2, 
+	primary key( id )
+);
