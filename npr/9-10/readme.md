@@ -42,3 +42,31 @@ sudo chmod 755 /usr/lib/cgi-bin/fact.cgi
 After completing these steps, the form in `fact.html` should correctly execute the `fact.cgi` script and display the expected output.
 
 `これらの手順を完了すると、'fact.html'のフォームが'fact.cgi'スクリプトを正しく実行し、期待される出力が表示されるはずです。`
+
+## extract.c Local Testing Guide (extract.c ローカルテストガイド)
+
+`extract.c` はCGIスクリプトとして設計されており、Webサーバー環境なしでコマンドラインからその動作をシミュレートして確認できます。
+
+### 1. Compile the C Source Code (Cソースコードをコンパイルする)
+
+まず、`extract.c` をコンパイルして実行ファイルを作成します。
+
+```bash
+gcc -o extract.cgi extract.c
+```
+
+### 2. Simulate GET Request (GETリクエストのシミュレーション)
+
+GETリクエストは、`QUERY_STRING` 環境変数にデータを設定することでシミュレートできます。(絶対パスで指定)
+
+```bash
+QUERY_STRING="name=John+Doe&age=30" /~/extract.cgi
+```
+
+### 3. Simulate POST Request (POSTリクエストのシミュレーション)
+
+POSTリクエストは、`REQUEST_METHOD` 環境変数を `POST` に設定し、標準入力にデータを渡すことでシミュレートできます。(絶対パス)
+
+```bash
+echo "data=Hello+World&id=123" | REQUEST_METHOD="POST" /~/extract.cgi
+```
