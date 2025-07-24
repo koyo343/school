@@ -6,28 +6,46 @@
 </head>
 
 <body>
+    <div>
+        <label for="name">name:</label>
+        <input type="text" id="name" placeholder="input username">
+    </div>
 
     <form name="input" action="">
-        <input type="text" name="message" value="">
-        <input type="button" name="send" id="send_button" value="message送信">
+        <input type="text" name="message" placeholder="input message">
+        <input type="button" name="send" id="send_button" value="send message">
     </from> 
 
     <div id="chat_area"></div>
 
     <script>
         let ws = new WebSocket('ws://localhost:8080');
+        const nameInput = document.getElementById('name');
+        const chatinput = document.getElementById('chat_area');
+
+        // WebSocketクライアント接続時
         ws.addEventListener('open', e => {
             console.log('WebSocket で接続');
         })
 
+        //サーバからのメッセージ受信時
         ws.addEventListener('message', e => {
             let chat = document.getElementById('chat_area');
             chat.innerHTML += e.data + "<br>";
-            console.log(e.data);
+            console.log("from server:",e.data);
         })
+
+        //クリック時
         document.getElementById('send_button').addEventListener('click', e => {
-            var my_message = document.input.message.value;
+            var message = document.input.message.value;
+            const name = nameInput.value;
+            if (name === '') {
+                alert('Please input your name');
+                return;
+            }
+            const my_message = name + ": " + message;
             ws.send(my_message);
+            console.log('from client:', my_message);
             document.input.message.value = "";
         })
     </script>
