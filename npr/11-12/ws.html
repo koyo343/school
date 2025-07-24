@@ -1,34 +1,36 @@
-<!DOCTYPE html><html lang="ja">
-<head> <meta charset="UTF-8"> <title> WebSocketの確認 </title> </head>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title> WebSocket chat </title>
+</head>
+
 <body>
 
-<form name="input" action="">
-    <input type="text" name="message" value="">
-    <input type="button" name="send" id="send_button" value="message送信">
-</from> 
+    <form name="input" action="">
+        <input type="text" name="message" value="">
+        <input type="button" name="send" id="send_button" value="message送信">
+    </from> 
 
-<div id="chat_area"></div>
+    <div id="chat_area"></div>
 
-<script>   <!-- json の埋め込み/実行 -->
-    // WebSocketのクライアントの生成 (※ localhost ～ マシン内で確認)
-    let ws = new WebSocket('ws://localhost:8080');
-    //接続時に実行 ～ openイベントが発生
-    ws.addEventListener('open', e => {
-        console.log('WebSocket で接続');
-    })
-    //サーバからデータ受信 ～ messageイベント発生、e.dataとして格納データをコンソール表示
-    ws.addEventListener('message', e => {
-        // メッセージを画面に追加表示
-        let chat = document.getElementById('chat_area');
-        chat.innerHTML += e.data + "<br>";
-        console.log(e.data);
-    })
-    //ボタンクリック時に実行 ～ my_messageに送信したい文字列を設定し、WSサーバへ送信
-    document.getElementById('send_button').addEventListener('click', e => {
-        var my_message = document.input.message.value;
-        ws.send(my_message);
-        document.input.message.value = "";
-    })
-</script>
-<!-- ※ 青字：JavaScriptイベントハンドラ 緑字：画面表示/メッセージ送信のWebSocket用メソッド -->
-</body></html>
+    <script>
+        let ws = new WebSocket('ws://localhost:8080');
+        ws.addEventListener('open', e => {
+            console.log('WebSocket で接続');
+        })
+
+        ws.addEventListener('message', e => {
+            let chat = document.getElementById('chat_area');
+            chat.innerHTML += e.data + "<br>";
+            console.log(e.data);
+        })
+        document.getElementById('send_button').addEventListener('click', e => {
+            var my_message = document.input.message.value;
+            ws.send(my_message);
+            document.input.message.value = "";
+        })
+    </script>
+</body>
+
+</html>
