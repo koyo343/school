@@ -6,7 +6,9 @@
     <input type="text" name="message" value="">
     <input type="button" name="send" id="send_button" value="message送信">
 </from> 
- 
+
+<div id="chat_area"></div>
+
 <script>   <!-- json の埋め込み/実行 -->
     // WebSocketのクライアントの生成 (※ localhost ～ マシン内で確認)
     let ws = new WebSocket('ws://localhost:8080');
@@ -16,6 +18,9 @@
     })
     //サーバからデータ受信 ～ messageイベント発生、e.dataとして格納データをコンソール表示
     ws.addEventListener('message', e => {
+        // メッセージを画面に追加表示
+        let chat = document.getElementById('chat_area');
+        chat.innerHTML += e.data + "<br>";
         console.log(e.data);
     })
     //ボタンクリック時に実行 ～ my_messageに送信したい文字列を設定し、WSサーバへ送信
