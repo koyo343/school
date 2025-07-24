@@ -1,9 +1,12 @@
 <!DOCTYPE html><html lang="ja">
 <head> <meta charset="UTF-8"> <title> WebSocketの確認 </title> </head>
 <body>
-<form name="input" action=""> <!-- 送信ボタンの設定 ～formのactionは未設定とする -->
+
+<form name="input" action="">
+    <input type="text" name="message" value="">
     <input type="button" name="send" id="send_button" value="message送信">
-</form>
+</from> 
+ 
 <script>   <!-- json の埋め込み/実行 -->
     // WebSocketのクライアントの生成 (※ localhost ～ マシン内で確認)
     let ws = new WebSocket('ws://localhost:8080');
@@ -17,7 +20,7 @@
     })
     //ボタンクリック時に実行 ～ my_messageに送信したい文字列を設定し、WSサーバへ送信
     document.getElementById('send_button').addEventListener('click', e => {
-        var my_message = "hello";
+        var my_message = document.input.message.value; // 送信したい文字列を取得;
         ws.send(my_message);
     })
 </script>
