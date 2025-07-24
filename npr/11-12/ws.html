@@ -2,7 +2,56 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title> WebSocket chat </title>
+    <title>WebSocket chat</title>
+    <style>
+        #chat_area {
+            width: 350px;
+            height: 400px;
+            border: 1px solid #ccc;
+            background: #f5f5f5;
+            overflow-y: scroll;
+            padding: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+        .my-message {
+            background: #00B900;
+            color: #222;
+            text-align: right;
+            margin: 5px 0 5px auto;
+            padding: 8px 12px;
+            border-radius: 15px 15px 0 15px;
+            display: inline-block;
+            max-width: 70%;
+        }
+        .other-message {
+            background: #fff;
+            color: #222;
+            text-align: left;
+            margin: 5px auto 5px 0;
+            padding: 8px 12px;
+            border-radius: 15px 15px 15px 0;
+            display: inline-block;
+            max-width: 70%;
+            border: 1px solid #ddd;
+        }
+        .sender {
+            font-size: 0.8em;
+            color: #888;
+            margin-bottom: 2px;
+            display: block;
+        }
+        #input_area {
+            width: 350px;
+            display: flex;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        #input_area input[type="text"] {
+            flex: 1;
+        }
+    </style>
 </head>
 
 <body>
@@ -11,44 +60,65 @@
         <input type="text" id="name" placeholder="input username">
     </div>
 
-    <form name="input" action="">
-        <input type="text" name="message" placeholder="input message">
-        <input type="button" name="send" id="send_button" value="send message">
-    </from> 
-
     <div id="chat_area"></div>
+
+    <div id="input_area">
+        <input type="text" id="message_box" placeholder="input message">
+        <input type="button" id="send_button" value="send message">
+    </div>
 
     <script>
         let ws = new WebSocket('ws://localhost:8080');
         const nameInput = document.getElementById('name');
-        const chatinput = document.getElementById('chat_area');
+        const chatArea = document.getElementById('chat_area');
+        const messageBox = document.getElementById('message_box');
 
-        // WebSocketクライアント接続時
         ws.addEventListener('open', e => {
             console.log('WebSocket で接続');
-        })
+        });
 
-        //サーバからのメッセージ受信時
+        //サーバーからのメッセージ受信時の処理
         ws.addEventListener('message', e => {
-            let chat = document.getElementById('chat_area');
-            chat.innerHTML += e.data + "<br>";
-            console.log("from server:",e.data);
-        })
+            let data = e.data;
+            let idx = data.indexOf(':');
+            let sender = idx >= 0 ? data.slice(0, idx) : '';
+            let msg = idx >= 0 ? data.slice(idx + 1).trim() : data;
 
-        //クリック時
+            // メッセージ要素
+            let msgDiv = document.createElement('div');
+            if (sender === nameInput.value) {
+                msgDiv.className = 'my-message';
+                msgDiv.innerHTML = `<span class="sender">you</span>${msg}`;
+            } else {
+                msgDiv.className = 'other-message';
+                msgDiv.innerHTML = `<span class="sender">${sender}</span>${msg}`;
+            }
+            chatArea.appendChild(msgDiv);
+            chatArea.scrollTop = chatArea.scrollHeight;
+
+            console.log("from server:", e.data);
+        });
+
+        //ボタン押した際の処理
         document.getElementById('send_button').addEventListener('click', e => {
-            var message = document.input.message.value;
+            const message = messageBox.value;
             const name = nameInput.value;
             if (name === '') {
                 alert('Please input your name');
                 return;
             }
+            if (message.trim() === '')
+                return;
             const my_message = name + ": " + message;
             ws.send(my_message);
             console.log('from client:', my_message);
-            document.input.message.value = "";
-        })
+            messageBox.value = "";
+        });
+
+        messageBox.addEventListener('keydown', e => {
+            if (e.key === 'Enter')
+                document.getElementById('send_button').click();
+        });
     </script>
 </body>
-
 </html>
